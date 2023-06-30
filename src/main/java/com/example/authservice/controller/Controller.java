@@ -23,7 +23,6 @@ public class Controller {
 
     private final PersonService personService;
 
-
     @PreAuthorize("hasAuthority('USER')")
     @GetMapping("hello/user")
     public ResponseEntity<String> helloUser() {
@@ -44,24 +43,16 @@ public class Controller {
     public Person crate(@RequestBody Person request) {
         return personService.create(request);
     }
-    @PreAuthorize("hasAuthority('ADMIN')")
+
+    @PreAuthorize("hasAuthority('USER')")
     @GetMapping("/all")
     public List<Person> findAll() {
         return personService.getAll();
     }
+
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("{id}")
     public Person getBuId(@PathVariable long id) {
-        return personService.getUserById(id);
-    }
-    @PreAuthorize("hasAuthority('USER')")
-    @GetMapping("/all")
-    public List<Person> findAllUser() {
-        return personService.getAll();
-    }
-    @PreAuthorize("hasAuthority('USER')")
-    @GetMapping("{id}")
-    public Person getBuIdUser(@PathVariable long id) {
         return personService.getUserById(id);
     }
 
