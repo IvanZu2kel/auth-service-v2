@@ -1,21 +1,27 @@
 package com.example.authservice.controller;
 
+import com.example.authservice.api.Person;
 import com.example.authservice.config.JwtAuthentication;
+import com.example.authservice.config.Role;
 import com.example.authservice.service.AuthService;
+import com.example.authservice.service.PersonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("api/")
+@RequestMapping(path = "/api")
 @RequiredArgsConstructor
 public class Controller {
     private final AuthService authService;
+
+    private final PersonService personService;
 
 
     @PreAuthorize("hasAuthority('USER')")
@@ -33,46 +39,46 @@ public class Controller {
         return ResponseEntity.ok("Hello admin " + authInfo.getPrincipal() + "!");
     }
 
-//    @PreAuthorize("hasAuthority('ADMIN')")
-//    @PostMapping
-//    public ResponseEntity<UserResponseDto> crate(@RequestBody UserRequest request) {
-//        return new ResponseEntity<>(convertor.convert(userService.create(userMapper.mapToUser(request))), HttpStatus.OK);
-//    }
-//
-//    @PreAuthorize("hasAuthority('ADMIN' && 'USER')")
-//    @GetMapping("{id}")
-//    public ResponseEntity<UserResponseDto> getBuId(@PathVariable long id) {
-//        return new ResponseEntity<>(convertor.convert(userService.getById(id)), HttpStatus.OK);
-//    }
-//
-//    @PreAuthorize("hasAuthority('USER')")
-//    @GetMapping("user")
-//    public ResponseEntity<List<UserResponseDto>> getAllUser() {
-//        return new ResponseEntity<>(convertor.getListResponse(userService.getAll()), HttpStatus.OK);
-//    }
-//    @PreAuthorize("hasAuthority('ADMIN')")
-//    @GetMapping("admin")
-//    public ResponseEntity<List<UserResponseDto>> getAllUsers() {
-//        return new ResponseEntity<>(convertor.getListResponse(userService.getAll()), HttpStatus.OK);
-//    }
-//
-//    @PreAuthorize("hasAuthority('ADMIN')")
-//    @DeleteMapping("{id}")
-//    public ResponseEntity deleteUser(@PathVariable long id) {
-//        userService.delete(id);
-//        return ResponseEntity.ok(HttpStatus.OK);
-//    }
-//
-//    @PreAuthorize("hasAuthority('ADMIN')")
-//    @PutMapping("{id}")
-//    public ResponseEntity<UserResponseDto> update(@PathVariable long id, @RequestBody UserRequest request) {
-//        return new ResponseEntity<>(convertor.convert(userService.update(id, userMapper.mapToUser(request))), HttpStatus.OK);
-//    }
-//
-//    @PreAuthorize("hasAuthority('ADMIN')")
-//    @PutMapping("{id}/role")
-//    public ResponseEntity<UserResponseDto> update(@PathVariable long id, @RequestParam(name = "text") String description) {
-//        User e = userService.changeRole(id, Role.valueOf(description));
-//        return new ResponseEntity<>(convertor.convert(userService.changeRole(id, Role.valueOf(description))), HttpStatus.OK);
-//    }
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping
+    public Person crate(@RequestBody Person request) {
+        return personService.create(request);
+    }
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/all")
+    public List<Person> findAll() {
+        return personService.getAll();
+    }
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("{id}")
+    public Person getBuId(@PathVariable long id) {
+        return personService.getUserById(id);
+    }
+    @PreAuthorize("hasAuthority('USER')")
+    @GetMapping("/all")
+    public List<Person> findAllUser() {
+        return personService.getAll();
+    }
+    @PreAuthorize("hasAuthority('USER')")
+    @GetMapping("{id}")
+    public Person getBuIdUser(@PathVariable long id) {
+        return personService.getUserById(id);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @DeleteMapping("{id}")
+    public ResponseEntity<HttpStatus> deleteUser(@PathVariable long id) {
+        personService.removeById(String.valueOf(id));
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PutMapping("{id}")
+    public Person update(@PathVariable long id, @RequestBody Person request) {
+        return personService.update(id, request);
+    }
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PutMapping("{id}/role")
+    public Person updateRole(@PathVariable long id, @RequestParam(name = "text") String description) {
+        return personService.updateRole(id, Role.valueOf(description));
+    }
 }

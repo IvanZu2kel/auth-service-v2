@@ -13,5 +13,5 @@ public class Person {
     private String firstName;
     private String lastName;
     private LocalDate birthday;
-    private Role roles;
+    private Role role;
 }

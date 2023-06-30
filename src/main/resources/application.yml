@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8082
 
 #springdoc:
 #  swagger-ui:
@@ -11,3 +11,6 @@ jwt:
     access: qBTmv4oXFFR2GwjexDJ4t6fsIUIUhhXqlktXjXdkcyygs8nPVEwMfo29VDRRepYDVV5IkIxBMzr7OEHXEHd37w==
     refresh: zL1HB3Pch05Avfynovxrf/kpF9O2m4NCWKJUjEp27s9J2jEG3ifiKCGylaZ8fDeoONSTJP/wAzKawB8F9rOMNg==
 
+api:
+  base:
+    url: http://localhost:8081/

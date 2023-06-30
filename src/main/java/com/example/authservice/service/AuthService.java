@@ -1,6 +1,5 @@
 package com.example.authservice.service;
 
-import com.example.authservice.FeignClient.FeignUserService;
 import com.example.authservice.api.JwtRequest;
 import com.example.authservice.api.JwtResponse;
 import com.example.authservice.api.Person;
@@ -20,13 +19,14 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final FeignUserService feignUserService;
+//    private final FeignUserService feignUserService;
+
+    private final PersonService personService;
     private final Map<String, String> refreshStorage = new HashMap<>();
     private final JwtProvider jwtProvider;
 
     public JwtResponse login(@NonNull JwtRequest authRequest) throws AuthException {
-        final Person person = feignUserService.getPersonByEmail(authRequest.getLogin())
-                .orElseThrow(() -> new AuthException("Пользователь не найден"));
+        final Person person = personService.getUserByEmail(authRequest.getLogin());
         if (person.getPassword().equals(authRequest.getPassword())) {
             final String accessToken = jwtProvider.generateAccessToken(person);
             final String refreshToken = jwtProvider.generateRefreshToken(person);
@@ -37,14 +37,13 @@ public class AuthService {
         }
     }
 
-    public JwtResponse getAccessToken(@NonNull String refreshToken) throws AuthException {
+    public JwtResponse getAccessToken(@NonNull String refreshToken) {
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             final Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             final String login = claims.getSubject();
             final String saveRefreshToken = refreshStorage.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
-                final Person person = feignUserService.getPersonByEmail(login)
-                        .orElseThrow(() -> new AuthException("Пользователь не найден"));
+                final Person person =  personService.getUserByEmail(login);
                 final String accessToken = jwtProvider.generateAccessToken(person);
                 return new JwtResponse(accessToken, null);
             }
@@ -58,8 +57,7 @@ public class AuthService {
             final String login = claims.getSubject();
             final String saveRefreshToken = refreshStorage.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
-                final Person person = feignUserService.getPersonByEmail(login)
-                        .orElseThrow(() -> new AuthException("Пользователь не найден"));
+                final Person person = personService.getUserByEmail(login);
                 final String accessToken = jwtProvider.generateAccessToken(person);
                 final String newRefreshToken = jwtProvider.generateRefreshToken(person);
                 refreshStorage.put(person.getEmail(), newRefreshToken);
